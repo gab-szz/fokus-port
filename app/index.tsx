@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
 import { ActionButton } from "./components/ActionButton";
 import { FokusButton } from "./components/FokusButton";
+import { Timer } from "./components/Timer";
 import longImg from "./long.png";
 import pomodoroImg from "./pomodoro.png";
 import shortImg from "./short.png";
@@ -14,12 +15,51 @@ const pomodoro = [
 
 export default function Index() {
   const [timerType, setTimerType] = useState(pomodoro[0]);
+  const [seconds, setSeconds] = useState(pomodoro[0].initialValue * 60); // Converte minutos para segundos
+  const [timerRunning, setTimerRunning] = useState(false);
   const [activeButton, setActiveButton] = useState(0);
+
+  const timerRef = useRef<null | number>(null);
+
+  const clear = () => {
+    if (timerRef.current != null) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+      setTimerRunning(false);
+    }
+  };
+
+  const toggleTimerType = (newTimerType: (typeof pomodoro)[0]) => {
+    clear();
+    setTimerType(newTimerType);
+    setSeconds(newTimerType.initialValue * 60); // Converte minutos para segundos
+  };
 
   function definirBotaoAtivo(index: number) {
     console.log(`Botão ${index} pressionado`);
     setActiveButton(index);
-    setTimerType(pomodoro[index]);
+    toggleTimerType(pomodoro[index]);
+  }
+
+  function toggleTime() {
+    if (timerRef.current) {
+      clear();
+      return;
+    }
+
+    setTimerRunning(true);
+
+    const id = setInterval(() => {
+      setSeconds((oldState) => {
+        if (oldState === 0) {
+          clear();
+          return timerType.initialValue * 60; // Reinicia o timer
+        }
+        return oldState - 1;
+      });
+    }, 1000);
+
+    timerRef.current = id;
   }
 
   return (
@@ -37,13 +77,11 @@ export default function Index() {
             />
           ))}
         </View>
-        <Text style={styles.timer}>
-          {new Date(timerType.initialValue * 1000).toLocaleTimeString("pt-BR", {
-            minute: "2-digit",
-            second: "2-digit",
-          })}
-        </Text>
-        <FokusButton />
+        <Timer totalSeconds={seconds} />
+        <FokusButton
+          onPress={toggleTime}
+          text={timerRunning ? "Pausar" : "Começar"}
+        />
       </View>
       <View style={styles.footer}>
         <Text style={styles.footerText}>
@@ -76,12 +114,6 @@ const styles = StyleSheet.create({
     borderColor: "#144480",
     gap: 32,
   },
-  timer: {
-    fontSize: 54,
-    color: "#FFF",
-    textAlign: "center",
-  },
-
   footer: {
     width: "80%",
   },

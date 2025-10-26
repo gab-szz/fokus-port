@@ -1,9 +1,14 @@
 import { Pressable, StyleSheet, Text } from "react-native";
 
-export const FokusButton = () => {
+interface FocusButtonProps {
+  onPress: () => void;
+  text: string;
+}
+
+export const FokusButton = ({ onPress, text }: FocusButtonProps) => {
   return (
-    <Pressable style={styles.button}>
-      <Text style={styles.buttonText}>Começar</Text>
+    <Pressable style={styles.button} onPress={onPress}>
+      <Text style={styles.buttonText}>{text}</Text>
     </Pressable>
   );
 };
