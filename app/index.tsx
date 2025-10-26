@@ -1,15 +1,49 @@
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
-import pomodoro from "./pomodoro.png";
+import { useState } from "react";
+import { Image, StyleSheet, Text, View } from "react-native";
+import { ActionButton } from "./components/ActionButton";
+import { FokusButton } from "./components/FokusButton";
+import longImg from "./long.png";
+import pomodoroImg from "./pomodoro.png";
+import shortImg from "./short.png";
+
+const pomodoro = [
+  { initialValue: 25, img: pomodoroImg, text: "Foco" },
+  { initialValue: 5, img: shortImg, text: "Pausa curta" },
+  { initialValue: 15, img: longImg, text: "pausa longa" },
+];
 
 export default function Index() {
+  const [timerType, setTimerType] = useState(pomodoro[0]);
+  const [activeButton, setActiveButton] = useState(0);
+
+  function definirBotaoAtivo(index: number) {
+    console.log(`Botão ${index} pressionado`);
+    setActiveButton(index);
+    setTimerType(pomodoro[index]);
+  }
+
   return (
     <View style={styles.container}>
-      <Image source={pomodoro} />
+      <Image source={timerType.img} />
       <View style={styles.actions}>
-        <Text style={styles.timer}>25:00</Text>
-        <Pressable style={styles.button}>
-          <Text style={styles.buttonText}>Começar</Text>
-        </Pressable>
+        <View style={styles.context}>
+          {pomodoro.map((button, index) => (
+            <ActionButton
+              key={index}
+              onPress={definirBotaoAtivo}
+              text={button.text}
+              index={index}
+              active={activeButton === index}
+            />
+          ))}
+        </View>
+        <Text style={styles.timer}>
+          {new Date(timerType.initialValue * 1000).toLocaleTimeString("pt-BR", {
+            minute: "2-digit",
+            second: "2-digit",
+          })}
+        </Text>
+        <FokusButton />
       </View>
       <View style={styles.footer}>
         <Text style={styles.footerText}>
@@ -47,16 +81,7 @@ const styles = StyleSheet.create({
     color: "#FFF",
     textAlign: "center",
   },
-  button: {
-    backgroundColor: "#B872FF",
-    padding: 8,
-    borderRadius: 32,
-  },
-  buttonText: {
-    textAlign: "center",
-    color: "#021123",
-    fontSize: 18,
-  },
+
   footer: {
     width: "80%",
   },
@@ -64,5 +89,10 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: "#98A0A8",
     fontSize: 12.5,
+  },
+  context: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
   },
 });
