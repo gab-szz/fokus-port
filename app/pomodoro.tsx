@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import longImg from "../assets/images/long.png";
 import pomodoroImg from "../assets/images/pomodoro.png";
 import shortImg from "../assets/images/short.png";
@@ -63,7 +64,7 @@ export default function Pomodoro() {
   }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Image source={timerType.img} />
       <View style={styles.actions}>
         <View style={styles.context}>
@@ -89,7 +90,7 @@ export default function Pomodoro() {
         </Text>
         <Text style={styles.footerText}>Desenvolvido por Alura.</Text>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
